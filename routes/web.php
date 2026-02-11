@@ -425,6 +425,28 @@ Route::get('/hq/laporan', function (Request $request) {
 
     $tahunPilih = $request->get('tahun', (string) $tahunMax);
 
+    // Ahli baru tahun pilih mengikut BULAN (sort by month untuk tahun yang dipilih)
+    $ahliByMonth = (clone $disahkan)
+        ->whereYear('created_at', $tahunPilih)
+        ->selectRaw('MONTH(created_at) as bulan, COUNT(*) as jumlah')
+        ->groupBy('bulan')
+        ->orderBy('bulan')
+        ->pluck('jumlah', 'bulan')
+        ->toArray();
+
+    $namaBulan = [
+        1 => 'Januari', 2 => 'Februari', 3 => 'Mac', 4 => 'April', 5 => 'Mei', 6 => 'Jun',
+        7 => 'Julai', 8 => 'Ogos', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Disember',
+    ];
+    $laporanBulanan = [];
+    for ($m = 1; $m <= 12; $m++) {
+        $laporanBulanan[] = [
+            'bulan' => $m,
+            'nama_bulan' => $namaBulan[$m],
+            'jumlah' => (int) ($ahliByMonth[$m] ?? 0),
+        ];
+    }
+
     // Ahli baru tahun pilih mengikut negeri
     $baruByNegeri = (clone $disahkan)
         ->whereYear('created_at', $tahunPilih)
@@ -441,7 +463,7 @@ Route::get('/hq/laporan', function (Request $request) {
 
     return view('pages.hq.laporan', compact(
         'laporan', 'demografi', 'jumlahNegeri', 'baruByNegeri',
-        'tukarNegeri', 'tahunMin', 'tahunMax', 'tahunPilih'
+        'tukarNegeri', 'tahunMin', 'tahunMax', 'tahunPilih', 'laporanBulanan'
     ));
 })->name('hq.laporan');
 
@@ -549,6 +571,39 @@ Route::post('/hq/edit-page/{slug}', function (Request $request, $slug) {
                 }
             } elseif (empty($item['image']) && !empty($page->content['items'][$i]['image'] ?? null)) {
                 $item['image'] = $page->content['items'][$i]['image'];
+            }
+        }
+    }
+    if ($slug === 'carta-organisasi') {
+        if (!empty($content['chart_tree']) && is_array($content['chart_tree'])) {
+            $chartImages = $request->file('chart_image');
+            if (is_array($chartImages)) {
+                $index = 0;
+                $applyChartImages = function (&$nodes) use ($chartImages, &$index, &$applyChartImages) {
+                    if (!is_array($nodes)) return;
+                    foreach ($nodes as &$node) {
+                        if (isset($chartImages[$index]) && $chartImages[$index]->isValid()) {
+                            $node['image'] = $chartImages[$index]->store('chart', 'public');
+                        }
+                        $index++;
+                        if (!empty($node['children'])) {
+                            $applyChartImages($node['children']);
+                        }
+                    }
+                };
+                $applyChartImages($content['chart_tree']);
+            }
+        }
+        if (!empty($content['executive']) && is_array($content['executive'])) {
+            foreach ($content['executive'] as $i => &$member) {
+                if ($request->hasFile('executive_image_' . $i)) {
+                    $file = $request->file('executive_image_' . $i);
+                    if ($file->isValid()) {
+                        $member['image'] = $file->store('chart', 'public');
+                    }
+                } elseif (empty($member['image']) && !empty($page->content['executive'][$i]['image'] ?? null)) {
+                    $member['image'] = $page->content['executive'][$i]['image'];
+                }
             }
         }
     }

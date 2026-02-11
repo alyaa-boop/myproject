@@ -3,7 +3,10 @@
 @section('title', 'Edit ' . ($slug === 'home' ? 'Laman Utama' : ucfirst(str_replace('-', ' ', $slug))) . ' - HQ')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 mt-6 mb-10">
+@php
+    $editWidth = $slug === 'home' ? 'w-full' : (in_array($slug, ['latar-belakang', 'carta-organisasi', 'aktiviti', 'galeri']) ? 'max-w-6xl mx-auto' : 'max-w-4xl mx-auto');
+@endphp
+<div class="{{ $editWidth }} px-4 mt-6 mb-10">
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-2xl font-bold">Edit Halaman: {{ $slug === 'home' ? 'Laman Utama' : ucfirst(str_replace('-', ' ', $slug)) }}</h1>
@@ -25,7 +28,7 @@
     <div class="rounded-lg border border-green-200 bg-green-50 p-4 mb-6 text-sm text-green-700">{{ session('success') }}</div>
     @endif
 
-    <form method="POST" action="{{ route('hq.edit-page.update', $slug) }}" class="space-y-6" enctype="{{ $slug === 'galeri' ? 'multipart/form-data' : 'application/x-www-form-urlencoded' }}">
+    <form method="POST" action="{{ route('hq.edit-page.update', $slug) }}" class="space-y-6" enctype="{{ in_array($slug, ['galeri', 'carta-organisasi']) ? 'multipart/form-data' : 'application/x-www-form-urlencoded' }}">
         @csrf
         <input type="hidden" name="content" id="content-input">
 
@@ -60,12 +63,29 @@ document.querySelector('form').addEventListener('submit', function(e) {
             itemEl.querySelectorAll('[data-edit-field]').forEach(f => {
                 let v = f.value;
                 if (f.type === 'number' && v !== '') v = parseInt(v, 10);
+                if (typeof v === 'string' && v.startsWith('dataurl:')) return;
                 item[f.dataset.editField] = v;
             });
             items.push(item);
         });
         data[key] = items;
     });
+    var chartTreeEl = document.getElementById('chart-tree-input');
+    if (chartTreeEl && chartTreeEl.value) {
+        try {
+            var tree = JSON.parse(chartTreeEl.value);
+            function stripPreview(nodes) {
+                if (!nodes) return nodes;
+                return (Array.isArray(nodes) ? nodes : [nodes]).map(function(n) {
+                    var rest = Object.assign({}, n);
+                    delete rest.preview;
+                    if (rest.children && rest.children.length) rest.children = stripPreview(rest.children);
+                    return rest;
+                });
+            }
+            data.chart_tree = stripPreview(tree);
+        } catch (_) {}
+    }
     document.getElementById('content-input').value = JSON.stringify(data);
 });
 </script>

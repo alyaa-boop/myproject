@@ -15,8 +15,12 @@
             </p>
         </div>
 
-        {{-- Organisation structure diagram --}}
+        {{-- Organisation structure diagram (chart_tree atau flat lama) --}}
         <div class="bg-gray-100 p-6 rounded-lg">
+            @php $chartTree = $content['chart_tree'] ?? null; @endphp
+            @if(!empty($chartTree) && is_array($chartTree))
+                @include('partials.chart-tree', ['nodes' => $chartTree])
+            @else
             <div class="flex flex-col items-center">
                 <div class="bg-primary text-white px-6 py-3 rounded-lg text-center mb-4 w-64">
                     <h3 class="font-bold">Pengerusi</h3>
@@ -58,6 +62,7 @@
                     <p class="text-xs">16 Negeri</p>
                 </div>
             </div>
+            @endif
         </div>
 
         {{-- Jawatankuasa Eksekutif --}}

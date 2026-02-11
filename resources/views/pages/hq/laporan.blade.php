@@ -74,8 +74,37 @@
                 <p class="text-sm text-gray-500 mt-1">Statistik keahlian disahkan Alumni 4B Malaysia mengikut tahun (data dari sistem).</p>
             </div>
 
-            @php $laporan = $laporan ?? []; @endphp
+            {{-- Laporan mengikut bulan (tahun yang dipilih) --}}
+            @php $laporanBulanan = $laporanBulanan ?? []; @endphp
+            <div class="p-6 border-b border-[#BAC4F7]/60">
+                <h3 class="font-semibold text-base mb-2">Laporan Mengikut Bulan (Tahun {{ $tahunPilih ?? date('Y') }})</h3>
+                <p class="text-sm text-gray-500 mb-4">Ahli baru diluluskan mengikut bulan untuk tahun yang dipilih.</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm max-w-xl">
+                        <thead class="text-left border-b border-[#BAC4F7]">
+                            <tr>
+                                <th class="p-3">Bulan</th>
+                                <th class="p-3 w-[140px]">Ahli Baru</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($laporanBulanan as $row)
+                                <tr class="border-b border-[#BAC4F7]/60">
+                                    <td class="p-3">{{ $row['nama_bulan'] }}</td>
+                                    <td class="p-3">
+                                        <span class="text-green-600 font-medium">{{ number_format($row['jumlah']) }}</span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
+            @php $laporan = $laporan ?? []; @endphp
+            <div class="p-4">
+                <h3 class="font-semibold text-base mb-2">Ringkasan Tahunan (Kumulatif)</h3>
+            </div>
             <div class="p-2 md:p-4 overflow-x-auto">
                 @if(empty($laporan))
                     <div class="p-8 text-center text-gray-500">Tiada data keahlian disahkan dalam sistem.</div>

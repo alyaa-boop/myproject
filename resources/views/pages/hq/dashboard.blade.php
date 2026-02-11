@@ -26,7 +26,7 @@
             </a>
 
             <a href="{{ route('hq.laporan') }}"
-               class="inline-flex items-center gap-2 px-4 py-2 text-sm text-white bg-primary rounded-md hover:bg-primary/90">
+               class="inline-flex items-center gap-2 px-4 py-2 text-sm text-white bg-primary rounded-md hover:bg-primary/90 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
                 {{-- report icon --}}
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path d="M9 17v-6m4 6V7m4 10v-4M3 3v18h18"/>

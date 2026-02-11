@@ -2,56 +2,51 @@
     $c = $content ?? [];
     $items = $c['items'] ?? [];
 @endphp
-<div class="border border-gray-200 rounded-lg p-6 space-y-6 bg-white">
-    <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Tajuk Halaman</label>
-        <input type="text" data-edit-key="title" value="{{ $c['title'] ?? '' }}" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
+{{-- Edit view sama layout seperti laman Galeri (grid kad) --}}
+<div class="container mx-auto px-4 md:px-6 py-12 md:py-16 rounded-lg border border-gray-200 bg-white">
+    <div class="mb-12">
+        <label class="block text-xs font-medium text-gray-500 mb-1">Tajuk Halaman</label>
+        <input type="text" data-edit-key="title" value="{{ $c['title'] ?? 'Galeri' }}"
+            class="w-full text-3xl font-bold text-gray-900 rounded-md border border-gray-200 px-3 py-2 focus:border-primary">
+        <label class="block text-xs font-medium text-gray-500 mt-2 mb-1">Keterangan</label>
+        <textarea data-edit-key="subtitle" rows="2" class="w-full text-gray-600 max-w-3xl rounded-md border border-gray-200 px-3 py-2 focus:border-primary">{{ $c['subtitle'] ?? 'Galeri gambar aktiviti dan program Alumni 4B Malaysia.' }}</textarea>
     </div>
-    <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Keterangan</label>
-        <textarea data-edit-key="subtitle" rows="2" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">{{ $c['subtitle'] ?? '' }}</textarea>
+
+    <div class="flex items-center justify-between mb-4">
+        <span class="text-sm font-medium text-gray-700">Kad Galeri (seret untuk susun semula)</span>
+        <button type="button" id="add-gallery-item" class="text-sm text-primary hover:underline font-medium">+ Tambah Kad</button>
     </div>
-    <div>
-        <div class="flex items-center justify-between mb-3">
-            <label class="block text-sm font-medium text-gray-700">Kad Galeri (Seret untuk susun semula)</label>
-            <button type="button" id="add-gallery-item" class="text-sm text-primary hover:underline font-medium">+ Tambah Kad</button>
-        </div>
-        <div id="gallery-sortable" class="space-y-4" data-edit-array="items">
-            @foreach($items as $idx => $item)
-            <div class="gallery-item border border-gray-200 rounded-lg p-4 bg-gray-50" data-edit-item>
-                <div class="flex gap-4">
-                    <div class="gallery-drag-handle flex-shrink-0 cursor-grab active:cursor-grabbing text-gray-400 pt-1" title="Seret untuk susun">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M7 2a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V4a2 2 0 012-2h2zm6 0a2 2 0 012 2v12a2 2 0 01-2 2h-2a2 2 0 01-2-2V4a2 2 0 012-2h2z"/></svg>
-                    </div>
-                    <div class="flex-shrink-0">
-                        <div class="w-32 h-32 rounded-lg bg-gray-200 overflow-hidden flex items-center justify-center">
-                            @if(!empty($item['image']))
-                            <img src="{{ str_starts_with($item['image'] ?? '', 'http') ? $item['image'] : asset('storage/' . $item['image']) }}" alt="" class="w-full h-full object-cover gallery-preview">
-                            @else
-                            <span class="text-gray-400 text-xs text-center px-2">Tiada gambar</span>
-                            @endif
-                        </div>
-                        <input type="file" name="gallery_image_{{ $idx }}" accept="image/*" class="mt-2 text-xs gallery-file">
-                        <input type="hidden" data-edit-field="image" value="{{ $item['image'] ?? '' }}">
-                    </div>
-                    <div class="flex-1 space-y-2">
-                        <div>
-                            <label class="block text-xs text-gray-600 mb-1">Kapsyen</label>
-                            <input type="text" data-edit-field="caption" value="{{ $item['caption'] ?? '' }}" placeholder="Kapsyen gambar" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-gray-600 mb-1">Butiran</label>
-                            <textarea data-edit-field="details" rows="3" placeholder="Penerangan lengkap" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">{{ $item['details'] ?? '' }}</textarea>
-                        </div>
-                        <button type="button" class="remove-gallery-item text-red-600 text-xs hover:underline">Buang kad</button>
-                    </div>
-                </div>
+
+    <div id="gallery-sortable" data-edit-array="items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        @foreach($items as $idx => $item)
+        <article class="gallery-item rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden hover:shadow-md transition-shadow" data-edit-item>
+            <div class="flex gap-2 p-2 bg-gray-50 border-b">
+                <span class="gallery-drag-handle cursor-grab active:cursor-grabbing text-gray-400" title="Seret untuk susun">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M7 2a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V4a2 2 0 012-2h2zm6 0a2 2 0 012 2v12a2 2 0 01-2 2h-2a2 2 0 01-2-2V4a2 2 0 012-2h2z"/></svg>
+                </span>
+                <button type="button" class="remove-gallery-item text-red-600 text-xs hover:underline ml-auto">Buang kad</button>
             </div>
-            @endforeach
-        </div>
-        <div id="gallery-empty" class="text-center py-8 text-gray-500 text-sm {{ count($items) > 0 ? 'hidden' : '' }}">
-            Tiada kad galeri. Klik "Tambah Kad" untuk mula.
-        </div>
+            <div class="gallery-image-area aspect-[4/3] bg-gray-100 overflow-hidden flex items-center justify-center">
+                @if(!empty($item['image']))
+                <img src="{{ str_starts_with($item['image'] ?? '', 'http') ? $item['image'] : asset('storage/' . $item['image']) }}" alt="" class="w-full h-full object-cover gallery-preview">
+                @else
+                <span class="text-gray-400 text-sm text-center px-2">Pilih gambar</span>
+                @endif
+            </div>
+            <div class="p-4">
+                <input type="file" name="gallery_image_{{ $idx }}" accept="image/*" class="mb-3 text-xs w-full gallery-file">
+                <input type="hidden" data-edit-field="image" value="{{ $item['image'] ?? '' }}">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Kapsyen</label>
+                <input type="text" data-edit-field="caption" value="{{ $item['caption'] ?? '' }}" placeholder="Kapsyen gambar" class="w-full text-lg font-semibold text-gray-900 rounded border border-gray-200 px-2 py-1 mb-2 focus:border-primary">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Butiran</label>
+                <textarea data-edit-field="details" rows="3" placeholder="Penerangan" class="w-full text-gray-600 text-sm rounded border border-gray-200 px-2 py-1 focus:border-primary">{{ $item['details'] ?? '' }}</textarea>
+            </div>
+        </article>
+        @endforeach
+    </div>
+
+    <div id="gallery-empty" class="text-center py-16 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 {{ count($items) > 0 ? 'hidden' : '' }}">
+        <p class="text-gray-500">Tiada kad galeri. Klik "Tambah Kad" untuk mula.</p>
     </div>
 </div>
 
@@ -64,31 +59,25 @@
     const addBtn = document.getElementById('add-gallery-item');
 
     const itemTemplate = (idx) => `
-        <div class="gallery-item border border-gray-200 rounded-lg p-4 bg-gray-50" data-edit-item>
-            <div class="flex gap-4">
-                <div class="gallery-drag-handle flex-shrink-0 cursor-grab active:cursor-grabbing text-gray-400 pt-1" title="Seret untuk susun">
+        <article class="gallery-item rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden" data-edit-item>
+            <div class="flex gap-2 p-2 bg-gray-50 border-b">
+                <span class="gallery-drag-handle cursor-grab active:cursor-grabbing text-gray-400" title="Seret untuk susun">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M7 2a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V4a2 2 0 012-2h2zm6 0a2 2 0 012 2v12a2 2 0 01-2 2h-2a2 2 0 01-2-2V4a2 2 0 012-2h2z"/></svg>
-                </div>
-                <div class="flex-shrink-0">
-                    <div class="w-32 h-32 rounded-lg bg-gray-200 overflow-hidden flex items-center justify-center">
-                        <span class="text-gray-400 text-xs text-center px-2">Pilih gambar</span>
-                    </div>
-                    <input type="file" name="gallery_image_${idx}" accept="image/*" class="mt-2 text-xs gallery-file">
-                    <input type="hidden" data-edit-field="image" value="">
-                </div>
-                <div class="flex-1 space-y-2">
-                    <div>
-                        <label class="block text-xs text-gray-600 mb-1">Kapsyen</label>
-                        <input type="text" data-edit-field="caption" placeholder="Kapsyen gambar" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-600 mb-1">Butiran</label>
-                        <textarea data-edit-field="details" rows="3" placeholder="Penerangan lengkap" class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"></textarea>
-                    </div>
-                    <button type="button" class="remove-gallery-item text-red-600 text-xs hover:underline">Buang kad</button>
-                </div>
+                </span>
+                <button type="button" class="remove-gallery-item text-red-600 text-xs hover:underline ml-auto">Buang kad</button>
             </div>
-        </div>
+            <div class="gallery-image-area aspect-[4/3] bg-gray-100 overflow-hidden flex items-center justify-center">
+                <span class="text-gray-400 text-sm">Pilih gambar</span>
+            </div>
+            <div class="p-4">
+                <input type="file" name="gallery_image_${idx}" accept="image/*" class="mb-3 text-xs w-full gallery-file">
+                <input type="hidden" data-edit-field="image" value="">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Kapsyen</label>
+                <input type="text" data-edit-field="caption" placeholder="Kapsyen gambar" class="w-full text-lg font-semibold text-gray-900 rounded border border-gray-200 px-2 py-1 mb-2 focus:border-primary">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Butiran</label>
+                <textarea data-edit-field="details" rows="3" placeholder="Penerangan" class="w-full text-gray-600 text-sm rounded border border-gray-200 px-2 py-1 focus:border-primary"></textarea>
+            </div>
+        </article>
     `;
 
     addBtn?.addEventListener('click', function() {
@@ -113,12 +102,16 @@
             const file = e.target.files[0];
             const reader = new FileReader();
             reader.onload = function() {
-                const img = e.target.closest('.flex-shrink-0').querySelector('.gallery-preview');
-                const placeholder = e.target.closest('.flex-shrink-0').querySelector('.flex.items-center.justify-center');
-                if (img) {
+                const wrap = e.target.closest('article');
+                const imgArea = wrap?.querySelector('.gallery-image-area');
+                if (imgArea) {
+                    imgArea.querySelector('.gallery-preview')?.remove();
+                    imgArea.querySelector('span')?.remove();
+                    const img = document.createElement('img');
                     img.src = reader.result;
-                } else if (placeholder) {
-                    placeholder.innerHTML = '<img src="' + reader.result + '" class="w-full h-full object-cover gallery-preview" alt="">';
+                    img.className = 'w-full h-full object-cover gallery-preview';
+                    img.alt = '';
+                    imgArea.appendChild(img);
                 }
             };
             reader.readAsDataURL(file);
