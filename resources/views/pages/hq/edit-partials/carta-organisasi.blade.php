@@ -42,14 +42,14 @@
                 <button type="button" @click="addRoot()" class="text-sm font-medium text-primary hover:underline shrink-0">+ Tambah punca</button>
             </div>
 
-            <div class="flex flex-col items-center">
+            <div class="flex flex-col items-center w-full overflow-x-auto">
                 {{-- Level 0: roots --}}
-                <div class="chart-children flex flex-wrap justify-center gap-6 mb-4" data-level="0">
+                <div class="chart-children flex flex-wrap justify-center gap-4 sm:gap-6 mb-4" data-level="0">
                     <template x-for="(root, ri) in chartTree" :key="root.id">
-                        <div class="chart-node flex flex-col items-center" :data-id="root.id">
-                            <div class="chart-card flex flex-col items-center bg-primary text-white px-5 py-4 rounded-xl w-56 relative shadow-md">
+                        <div class="chart-node flex flex-col items-center flex-shrink-0" :data-id="root.id">
+                            <div class="chart-card flex flex-col items-center bg-primary text-white px-3 py-3 sm:px-5 sm:py-4 rounded-xl w-[clamp(7rem,20vmin,14rem)] min-w-[7rem] relative shadow-md" data-level="0">
                                 <span class="chart-drag-handle cursor-grab active:cursor-grabbing absolute left-2 top-2 text-white/80 text-sm leading-none select-none" title="Seret untuk susun">⋮⋮</span>
-                                <div class="relative w-14 h-14 rounded-full bg-white/20 flex items-center justify-center mb-2 overflow-hidden shrink-0">
+                                <div class="relative w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-white/20 flex items-center justify-center mb-1 sm:mb-2 overflow-hidden shrink-0">
                                     <template x-if="root.preview || root.image">
                                         <img :src="(root.preview || (root.image && (root.image.startsWith('http') ? root.image : '/storage/' + root.image)))" class="w-full h-full object-cover" alt="">
                                     </template>
@@ -58,21 +58,21 @@
                                     </template>
                                     <input type="file" accept="image/*" name="chart_image[]" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer chart-file rounded-full" @change="onFile($event, root)">
                                 </div>
-                                <input type="text" x-model="root.position" placeholder="Jawatan" class="w-full bg-transparent border-b border-white/50 text-center text-white font-bold text-sm py-0.5">
-                                <input type="text" x-model="root.name" placeholder="Nama" class="w-full bg-transparent border-b border-white/40 text-center text-white text-xs mt-1 py-0.5">
-                                <div class="flex gap-2 mt-3 flex-shrink-0">
-                                    <button type="button" @click.stop="addChild(root)" class="text-xs bg-white/25 hover:bg-white/35 px-2.5 py-1.5 rounded border border-white/30 pointer-events-auto">Tambah Anak</button>
-                                    <button type="button" @click.stop="removeNode(chartTree, ri)" class="text-xs bg-red-500/90 hover:bg-red-600 px-2.5 py-1.5 rounded pointer-events-auto">Padam</button>
+                                <input type="text" x-model="root.position" placeholder="Jawatan" class="w-full bg-transparent border-b border-white/50 text-center text-white font-bold text-xs sm:text-sm py-0.5 truncate">
+                                <input type="text" x-model="root.name" placeholder="Nama" class="w-full bg-transparent border-b border-white/40 text-center text-white text-[10px] sm:text-xs mt-1 py-0.5 truncate">
+                                <div class="flex gap-1 sm:gap-2 mt-2 sm:mt-3 flex-shrink-0 flex-wrap justify-center">
+                                    <button type="button" @click.stop="addChild(root)" class="text-[10px] sm:text-xs bg-white/25 hover:bg-white/35 px-1.5 py-1 sm:px-2.5 sm:py-1.5 rounded border border-white/30 text-white pointer-events-auto whitespace-nowrap">Tambah Anak</button>
+                                    <button type="button" @click.stop="removeNode(chartTree, ri)" class="text-[10px] sm:text-xs bg-red-500/80 hover:bg-red-600 px-1.5 py-1 sm:px-2.5 sm:py-1.5 rounded text-white pointer-events-auto whitespace-nowrap">Padam</button>
                                 </div>
                             </div>
                             {{-- Level 1: root's children --}}
                             <div class="w-0.5 h-4 bg-gray-300" x-show="root.children && root.children.length"></div>
-                            <div class="chart-children flex flex-wrap justify-center gap-4 my-2" :data-parent-id="root.id" x-show="root.children && root.children.length">
+                            <div class="chart-children flex flex-wrap justify-center gap-3 sm:gap-4 my-2" :data-parent-id="root.id" x-show="root.children && root.children.length">
                                 <template x-for="(child, ci) in root.children" :key="child.id">
-                                    <div class="chart-node flex flex-col items-center" :data-id="child.id">
-                                        <div class="chart-card flex flex-col items-center bg-primary/90 text-white px-4 py-3 rounded-xl w-48 relative shadow">
+                                    <div class="chart-node flex flex-col items-center flex-shrink-0" :data-id="child.id">
+                                        <div class="chart-card flex flex-col items-center bg-[#3d4a9e] text-white px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl w-[clamp(6rem,16vmin,12rem)] min-w-[6rem] relative shadow" data-level="1">
                                             <span class="chart-drag-handle cursor-grab active:cursor-grabbing absolute left-1.5 top-1.5 text-white/80 text-xs leading-none select-none">⋮⋮</span>
-                                            <div class="relative w-11 h-11 rounded-full bg-white/20 flex items-center justify-center overflow-hidden shrink-0">
+                                            <div class="relative w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/20 flex items-center justify-center overflow-hidden shrink-0">
                                                 <template x-if="child.preview || child.image">
                                                     <img :src="(child.preview || (child.image && (child.image.startsWith('http') ? child.image : '/storage/' + child.image)))" class="w-full h-full object-cover" alt="">
                                                 </template>
@@ -81,21 +81,21 @@
                                                 </template>
                                                 <input type="file" accept="image/*" name="chart_image[]" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer chart-file rounded-full" @change="onFile($event, child)">
                                             </div>
-                                            <input type="text" x-model="child.position" placeholder="Jawatan" class="w-full bg-transparent border-b border-white/50 text-center font-bold text-xs py-0.5">
-                                            <input type="text" x-model="child.name" placeholder="Nama" class="w-full bg-transparent border-b border-white/40 text-center text-xs mt-0.5 py-0.5">
-                                            <div class="flex gap-1.5 mt-2 flex-shrink-0">
-                                                <button type="button" @click.stop="addChild(child)" class="text-xs bg-white/25 hover:bg-white/35 px-2 py-1 rounded border border-white/30 pointer-events-auto">Tambah Anak</button>
-                                                <button type="button" @click.stop="removeNode(root.children, ci)" class="text-xs bg-red-500/90 hover:bg-red-600 px-2 py-1 rounded pointer-events-auto">Padam</button>
+                                            <input type="text" x-model="child.position" placeholder="Jawatan" class="w-full bg-transparent border-b border-white/50 text-center text-white font-bold text-[10px] sm:text-xs py-0.5 truncate">
+                                            <input type="text" x-model="child.name" placeholder="Nama" class="w-full bg-transparent border-b border-white/40 text-center text-white text-[10px] mt-0.5 py-0.5 truncate">
+                                            <div class="flex gap-1 sm:gap-1.5 mt-1.5 sm:mt-2 flex-shrink-0 flex-wrap justify-center">
+                                                <button type="button" @click.stop="addChild(child)" class="text-[9px] sm:text-xs bg-white/25 hover:bg-white/35 px-1 py-0.5 sm:px-2 sm:py-1 rounded border border-white/30 text-white pointer-events-auto whitespace-nowrap">Tambah Anak</button>
+                                                <button type="button" @click.stop="removeNode(root.children, ci)" class="text-[9px] sm:text-xs bg-red-500/80 hover:bg-red-600 px-1 py-0.5 sm:px-2 sm:py-1 rounded text-white pointer-events-auto whitespace-nowrap">Padam</button>
                                             </div>
                                         </div>
                                         {{-- Level 2: child's children --}}
                                         <div class="w-0.5 h-3 bg-gray-300" x-show="child.children && child.children.length"></div>
-                                        <div class="chart-children flex flex-wrap justify-center gap-3 mt-2" :data-parent-id="child.id" x-show="child.children && child.children.length">
+                                        <div class="chart-children flex flex-wrap justify-center gap-2 sm:gap-3 mt-2" :data-parent-id="child.id" x-show="child.children && child.children.length">
                                             <template x-for="(grand, gi) in child.children" :key="grand.id">
-                                                <div class="chart-node flex flex-col items-center" :data-id="grand.id">
-                                                    <div class="chart-card flex flex-col items-center bg-primary/80 text-white px-3 py-2.5 rounded-xl w-40 relative shadow">
+                                                <div class="chart-node flex flex-col items-center flex-shrink-0" :data-id="grand.id">
+                                                    <div class="chart-card flex flex-col items-center bg-[#5a65b8] text-white px-2 py-2 sm:px-3 sm:py-2.5 rounded-xl w-[clamp(5rem,14vmin,10rem)] min-w-[5rem] relative shadow" data-level="2">
                                                         <span class="chart-drag-handle cursor-grab active:cursor-grabbing absolute left-1 top-1 text-white/80 text-xs leading-none select-none">⋮⋮</span>
-                                                        <div class="relative w-9 h-9 rounded-full bg-white/20 flex items-center justify-center overflow-hidden shrink-0">
+                                                        <div class="relative w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/20 flex items-center justify-center overflow-hidden shrink-0">
                                                             <template x-if="grand.preview || grand.image">
                                                                 <img :src="(grand.preview || (grand.image && (grand.image.startsWith('http') ? grand.image : '/storage/' + grand.image)))" class="w-full h-full object-cover" alt="">
                                                             </template>
@@ -104,9 +104,35 @@
                                                             </template>
                                                             <input type="file" accept="image/*" name="chart_image[]" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer chart-file rounded-full" @change="onFile($event, grand)">
                                                         </div>
-                                                        <input type="text" x-model="grand.position" placeholder="Jawatan" class="w-full bg-transparent border-b border-white/50 text-center font-bold text-xs py-0.5">
-                                                        <input type="text" x-model="grand.name" placeholder="Nama" class="w-full bg-transparent border-b border-white/40 text-center text-xs mt-0.5 py-0.5">
-                                                        <button type="button" @click.stop="removeNode(child.children, gi)" class="text-xs bg-red-500/90 hover:bg-red-600 px-2 py-1 rounded mt-1.5 pointer-events-auto">Padam</button>
+                                                        <input type="text" x-model="grand.position" placeholder="Jawatan" class="w-full bg-transparent border-b border-white/50 text-center text-white font-bold text-[10px] py-0.5 truncate">
+                                                        <input type="text" x-model="grand.name" placeholder="Nama" class="w-full bg-transparent border-b border-white/40 text-center text-white text-[9px] sm:text-[10px] mt-0.5 py-0.5 truncate">
+                                                        <div class="flex gap-1 sm:gap-1.5 mt-1.5 sm:mt-2 flex-shrink-0 flex-wrap justify-center">
+                                                            <button type="button" @click.stop="addChild(grand)" class="text-[9px] sm:text-[10px] bg-white/25 hover:bg-white/35 px-1 py-0.5 sm:px-2 sm:py-1 rounded border border-white/30 text-white pointer-events-auto whitespace-nowrap">Tambah Anak</button>
+                                                            <button type="button" @click.stop="removeNode(child.children, gi)" class="text-[9px] sm:text-[10px] bg-red-500/80 hover:bg-red-600 px-1 py-0.5 sm:px-2 sm:py-1 rounded text-white pointer-events-auto whitespace-nowrap">Padam</button>
+                                                        </div>
+                                                    </div>
+                                                    {{-- Level 3: grand's children --}}
+                                                    <div class="w-0.5 h-3 bg-gray-300" x-show="grand.children && grand.children.length"></div>
+                                                    <div class="chart-children flex flex-wrap justify-center gap-1.5 sm:gap-2 mt-2" :data-parent-id="grand.id" x-show="grand.children && grand.children.length">
+                                                        <template x-for="(great, ggi) in grand.children" :key="great.id">
+                                                            <div class="chart-node flex flex-col items-center flex-shrink-0" :data-id="great.id">
+                                                                <div class="chart-card flex flex-col items-center bg-[#7d87c9] text-white px-2 py-1.5 sm:px-2.5 sm:py-2 rounded-xl w-[clamp(4rem,12vmin,9rem)] min-w-[4rem] relative shadow" data-level="3">
+                                                                    <span class="chart-drag-handle cursor-grab active:cursor-grabbing absolute left-0.5 top-0.5 text-white/80 text-[10px] leading-none select-none">⋮⋮</span>
+                                                                    <div class="relative w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white/20 flex items-center justify-center overflow-hidden shrink-0">
+                                                                        <template x-if="great.preview || great.image">
+                                                                            <img :src="(great.preview || (great.image && (great.image.startsWith('http') ? great.image : '/storage/' + great.image)))" class="w-full h-full object-cover" alt="">
+                                                                        </template>
+                                                                        <template x-if="!great.preview && !great.image">
+                                                                            <span class="text-white/60 text-[9px]">Foto</span>
+                                                                        </template>
+                                                                        <input type="file" accept="image/*" name="chart_image[]" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer chart-file rounded-full" @change="onFile($event, great)">
+                                                                    </div>
+                                                                    <input type="text" x-model="great.position" placeholder="Jawatan" class="w-full bg-transparent border-b border-white/50 text-center text-white font-bold text-[10px] py-0.5 truncate">
+                                                                    <input type="text" x-model="great.name" placeholder="Nama" class="w-full bg-transparent border-b border-white/40 text-center text-white text-[10px] mt-0.5 py-0.5 truncate">
+                                                                    <button type="button" @click.stop="removeNode(grand.children, ggi)" class="text-[9px] sm:text-[10px] bg-red-500/80 hover:bg-red-600 text-white px-1 py-0.5 sm:px-2 sm:py-1 rounded mt-1 pointer-events-auto whitespace-nowrap">Padam</button>
+                                                                </div>
+                                                            </div>
+                                                        </template>
                                                     </div>
                                                 </div>
                                             </template>
