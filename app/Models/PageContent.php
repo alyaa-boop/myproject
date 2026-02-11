@@ -71,19 +71,7 @@ class PageContent extends Model
                 'jk_keahlian' => 'Encik Azman bin Aziz',
                 'jk_aktiviti' => 'Puan Nurul Huda binti Ismail',
                 'jk_perhubungan' => 'Encik Chong Kok Wai',
-                'chart_tree' => [
-                    ['id' => '1', 'position' => 'Pengerusi', 'name' => "Dato' Ahmad bin Abdullah", 'image' => null, 'children' => [
-                        ['id' => '2', 'position' => 'Timbalan Pengerusi', 'name' => 'Puan Siti binti Hassan', 'image' => null, 'children' => [
-                            ['id' => '5', 'position' => 'JK Keahlian', 'name' => 'Encik Azman bin Aziz', 'image' => null, 'children' => []],
-                        ]],
-                        ['id' => '3', 'position' => 'Setiausaha', 'name' => 'Encik Ravi a/l Chandran', 'image' => null, 'children' => [
-                            ['id' => '6', 'position' => 'JK Aktiviti', 'name' => 'Puan Nurul Huda binti Ismail', 'image' => null, 'children' => []],
-                        ]],
-                        ['id' => '4', 'position' => 'Bendahari', 'name' => 'Puan Lim Mei Ling', 'image' => null, 'children' => [
-                            ['id' => '7', 'position' => 'JK Perhubungan', 'name' => 'Encik Chong Kok Wai', 'image' => null, 'children' => []],
-                        ]],
-                    ]],
-                ],
+                'chart_tree' => [],
                 'executive' => [
                     ['position' => 'Pengerusi', 'name' => "Dato' Ahmad bin Abdullah", 'bio' => "Bekas Pengerusi 4B Malaysia (2010-2015). Mempunyai pengalaman lebih 30 tahun dalam bidang kepimpinan belia.", 'email' => 'ahmad@alumni4b.org.my', 'phone' => '012-345 6789'],
                     ['position' => 'Timbalan Pengerusi', 'name' => 'Puan Siti binti Hassan', 'bio' => "Bekas Timbalan Pengerusi 4B Selangor (2012-2018). Aktif dalam program pembangunan wanita dan keluarga.", 'email' => 'siti@alumni4b.org.my', 'phone' => '013-456 7890'],

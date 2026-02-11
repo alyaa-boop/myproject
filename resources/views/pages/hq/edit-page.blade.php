@@ -44,8 +44,11 @@
 @push('scripts')
 <script>
 document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    document.dispatchEvent(new CustomEvent('hq:sync-chart-tree'));
+    const form = this;
     const data = {};
-    this.querySelectorAll('[data-edit-key]').forEach(el => {
+    form.querySelectorAll('[data-edit-key]').forEach(el => {
         const key = el.dataset.editKey;
         if (el.type === 'checkbox') {
             data[key] = el.checked;
@@ -55,7 +58,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
             data[key] = el.value;
         }
     });
-    this.querySelectorAll('[data-edit-array]').forEach(container => {
+    form.querySelectorAll('[data-edit-array]').forEach(container => {
         const key = container.dataset.editArray;
         const items = [];
         container.querySelectorAll('[data-edit-item]').forEach(itemEl => {
@@ -70,23 +73,46 @@ document.querySelector('form').addEventListener('submit', function(e) {
         });
         data[key] = items;
     });
+    var treeData = null;
     var chartTreeEl = document.getElementById('chart-tree-input');
     if (chartTreeEl && chartTreeEl.value) {
-        try {
-            var tree = JSON.parse(chartTreeEl.value);
-            function stripPreview(nodes) {
-                if (!nodes) return nodes;
-                return (Array.isArray(nodes) ? nodes : [nodes]).map(function(n) {
-                    var rest = Object.assign({}, n);
-                    delete rest.preview;
-                    if (rest.children && rest.children.length) rest.children = stripPreview(rest.children);
-                    return rest;
-                });
-            }
-            data.chart_tree = stripPreview(tree);
-        } catch (_) {}
+        try { treeData = JSON.parse(chartTreeEl.value); } catch (_) {}
     }
-    document.getElementById('content-input').value = JSON.stringify(data);
+    if (!treeData && typeof Alpine !== 'undefined') {
+        var editorEl = document.getElementById('chart-tree-editor');
+        if (editorEl) {
+            var comp = Alpine.$data && Alpine.$data(editorEl);
+            if (comp && comp.chartTree) treeData = comp.chartTree;
+            else if (editorEl._x_dataStack && editorEl._x_dataStack[0] && editorEl._x_dataStack[0].chartTree)
+                treeData = editorEl._x_dataStack[0].chartTree;
+        }
+    }
+    if (treeData) {
+        function stripPreview(nodes) {
+            if (!nodes) return nodes;
+            return (Array.isArray(nodes) ? nodes : [nodes]).map(function(n) {
+                var rest = Object.assign({}, n);
+                delete rest.preview;
+                if (rest.children && rest.children.length) rest.children = stripPreview(rest.children);
+                return rest;
+            });
+        }
+        data.chart_tree = stripPreview(treeData);
+    }
+    const fd = new FormData(form);
+    fd.set('content', JSON.stringify(data));
+    fd.delete('chart_tree_json');
+    const action = form.action;
+    const btn = form.querySelector('button[type="submit"]');
+    const origText = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Menyimpan...'; }
+    fetch(action, {
+        method: 'POST',
+        body: fd,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => { if (r.ok || r.redirected) { window.location.href = r.redirected ? r.url : action; } else return r.text().then(t => { throw new Error(t || 'Simpan gagal'); }); })
+    .catch(err => { alert(err.message || 'Ralat: ' + err); if (btn) { btn.disabled = false; btn.textContent = origText; } });
 });
 </script>
 @endpush

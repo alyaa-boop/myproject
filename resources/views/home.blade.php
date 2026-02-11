@@ -11,7 +11,7 @@
             <div class="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
                 <div class="space-y-4">
                     <h1 class="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-                        {{ $content['hero_title'] ?? 'Selamat Datang ke Portal Alumni 4B Malaysia' }}
+                        {{ $content['hero_title'] ?? 'hahahahSelamat Datang ke Portal Alumni 4B Malaysia' }}
                     </h1>
                     <p class="md:text-xl text-white/90">
                         {{ $content['hero_subtitle'] ?? 'Menghubungkan semua bekas ahli 4B di seluruh Malaysia untuk terus menyumbang kepada pembangunan masyarakat dan negara.' }}

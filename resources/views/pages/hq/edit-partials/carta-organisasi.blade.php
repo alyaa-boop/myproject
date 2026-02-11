@@ -2,20 +2,7 @@
     $c = $content ?? [];
     $chartTree = $c['chart_tree'] ?? null;
     if (empty($chartTree) || !is_array($chartTree)) {
-        $def = \App\Models\PageContent::defaultContent('carta-organisasi');
-        $chartTree = $def['chart_tree'] ?? [
-            ['id' => '1', 'position' => 'Pengerusi', 'name' => $c['pengerusi'] ?? $def['pengerusi'] ?? '', 'image' => null, 'children' => [
-                ['id' => '2', 'position' => 'Timbalan Pengerusi', 'name' => $c['tp'] ?? $def['tp'] ?? '', 'image' => null, 'children' => [
-                    ['id' => '5', 'position' => 'JK Keahlian', 'name' => $c['jk_keahlian'] ?? $def['jk_keahlian'] ?? '', 'image' => null, 'children' => []],
-                ]],
-                ['id' => '3', 'position' => 'Setiausaha', 'name' => $c['setiausaha'] ?? $def['setiausaha'] ?? '', 'image' => null, 'children' => [
-                    ['id' => '6', 'position' => 'JK Aktiviti', 'name' => $c['jk_aktiviti'] ?? $def['jk_aktiviti'] ?? '', 'image' => null, 'children' => []],
-                ]],
-                ['id' => '4', 'position' => 'Bendahari', 'name' => $c['bendahari'] ?? $def['bendahari'] ?? '', 'image' => null, 'children' => [
-                    ['id' => '7', 'position' => 'JK Perhubungan', 'name' => $c['jk_perhubungan'] ?? $def['jk_perhubungan'] ?? '', 'image' => null, 'children' => []],
-                ]],
-            ]],
-        ];
+        $chartTree = [];
     }
     $chartTreeJson = json_encode($chartTree);
     $executive = $c['executive'] ?? \App\Models\PageContent::defaultContent('carta-organisasi')['executive'] ?? [];
@@ -35,8 +22,21 @@
         </div>
 
         {{-- Tree diagram editor (Alpine + Sortable) --}}
-        <div class="bg-gray-100 p-6 rounded-lg" x-data="chartTreeEditor(@js($chartTree))" x-init="initSortables()">
-            <input type="hidden" id="chart-tree-input" :value="JSON.stringify(chartTree)">
+        <div id="chart-tree-editor" class="bg-gray-100 p-6 rounded-lg" x-data="chartTreeEditor(@js($chartTree))"
+            x-init="
+                initSortables();
+                const syncToInput = () => {
+                    const el = document.getElementById('chart-tree-input');
+                    if (el) {
+                        const strip = n => { if (!n) return n; return (Array.isArray(n) ? n : [n]).map(x => { const c = Object.assign({}, x); delete c.preview; if (c.children?.length) c.children = strip(c.children); return c; }); };
+                        el.value = JSON.stringify(strip(chartTree));
+                    }
+                };
+                $watch('chartTree', syncToInput);
+                $nextTick(() => syncToInput());
+                document.addEventListener('hq:sync-chart-tree', syncToInput);
+            ">
+            <input type="hidden" id="chart-tree-input">
             <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                 <span class="text-sm text-gray-600">Seret ikon ⋮⋮ untuk susun. Klik bulatan foto sahaja untuk upload gambar.</span>
                 <button type="button" @click="addRoot()" class="text-sm font-medium text-primary hover:underline shrink-0">+ Tambah punca</button>

@@ -608,6 +608,9 @@ Route::post('/hq/edit-page/{slug}', function (Request $request, $slug) {
         }
     }
     $merged = array_replace_recursive($page->content ?? [], $content);
+    if ($slug === 'carta-organisasi' && isset($content['chart_tree']) && is_array($content['chart_tree'])) {
+        $merged['chart_tree'] = $content['chart_tree'];
+    }
     $page->update(['content' => $merged]);
     return redirect()->route('hq.edit-page', $slug)->with('success', 'Kandungan halaman berjaya disimpan.');
 })->name('hq.edit-page.update')->where('slug', 'home|latar-belakang|carta-organisasi|aktiviti|galeri');
